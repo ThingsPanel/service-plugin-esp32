@@ -1,0 +1,21 @@
+# configs/config.yaml
+server:
+  port: 5000
+  http_port: 8005
+  maxConnections: 100
+  heartbeatTimeout: 60 
+
+platform:
+  url: "http://127.0.0.1:9999"
+  mqtt_broker: "mqtt://127.0.0.1:1883"
+  mqtt_username: "plugin"
+  mqtt_password: "plugin"
+  service_identifier: "Template"  # 添加服务标识符
+
+log:
+  level: "debug"
+  filePath: "logs/app.log"
+  maxSize: 100
+  maxBackups: 3
+  maxAge: 28
+  compress: true

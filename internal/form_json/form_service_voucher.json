@@ -1,0 +1,64 @@
+[
+    {
+        "dataKey": "ServerURL",
+        "label": "ESP32服务地址",
+        "placeholder": "比如http://127.0.0.1:8002/xiaozhi",
+        "type": "input",
+        "validate": {
+            "message": "不能为空",
+            "required": true,
+            "type": "string"
+        }
+    },
+    {
+        "dataKey": "Secret",
+        "label": "ESP32服务密钥",
+        "placeholder": "ESP32服务器配置文件./data/.config.yaml【server.secret】",
+        "type": "input",
+        "validate": {
+            "required": true,
+            "type": "string"
+        }
+    },
+    {
+        "dataKey": "ThingsPanelApiURL",
+        "label": "ThingsPanel API URL",
+        "placeholder": "ThingsPanel API URL, 比如https://thingspanel.cn/api/v1",
+        "type": "input",
+        "validate": {
+            "required": true,
+            "type": "string"
+        }
+    },
+    {
+        "dataKey": "ThingsPanelApiKey",
+        "label": "ThingsPanel API Key",
+        "placeholder": "ThingsPanel租户后台【系统管理】下面的API keys",
+        "type": "input",
+        "validate": {
+            "required": true,
+            "type": "string"
+        }
+    },
+    {
+        "type": "select",
+        "dataKey": "auth_type",
+        "required": true,
+        "label": "接入方式",
+        "options": [
+            {
+                "label": "自动",
+                "value": "auto"
+            },
+            {
+                "label": "手动",
+                "value": "manual"
+            }
+        ],
+        "placeholder": "请选择设备接入方式",
+        "validate": {
+            "type": "string",
+            "required": true
+        }
+    }
+]
