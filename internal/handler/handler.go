@@ -65,9 +65,6 @@ func (h *HTTPHandler) RegisterHandlers() *handler.Handler {
 	// 设置获取设备列表处理函数
 	hdl.SetGetDeviceListHandler(h.handleGetDeviceList)
 
-	// 设置获取设备详细处理函数
-	hdl.SetGetDeviceInfoHandler(h.handleGetDeviceInfo)
-
 	return hdl
 }
 
@@ -272,117 +269,6 @@ func (h *HTTPHandler) handleGetDeviceList(req *handler.GetDeviceListRequest) (*h
 		"message": rsp.Message,
 		"data":    rsp.Data,
 	}).Info("接口响应")
-
-	return &rsp, nil
-}
-
-// handleGetDeviceInfo 处理获取设备详细请求
-func (h *HTTPHandler) handleGetDeviceInfo(req *handler.GetDeviceInfoRequest) (*handler.GetDeviceInfoResponse, error) {
-	h.logger.WithFields(logrus.Fields{
-		"device_code": req.Key,
-		"voucher":     req.Voucher,
-		"raw_request": fmt.Sprintf("%+v", req),
-	}).Info("收到获取设备详细请求")
-
-	// 检查请求参数
-	if req.Key == "" {
-		h.logger.Error("设备编码为空")
-		return nil, fmt.Errorf("设备编码不能为空")
-	}
-
-	if req.Voucher == "" {
-		h.logger.Error("凭证为空")
-		return nil, fmt.Errorf("凭证不能为空")
-	}
-
-	// 解析Voucher
-	var voucher struct {
-		ServerURL         string `json:"ServerURL"`
-		Secret            string `json:"Secret"`
-		AgentId           string `json:"AgentId"`
-		ThingsPanelApiKey string `json:"ThingsPanelApiKey"`
-	}
-	if err := json.Unmarshal([]byte(req.Voucher), &voucher); err != nil {
-		h.logger.WithError(err).Error("解析Voucher失败")
-		return nil, err
-	}
-
-	// 检查Voucher中的必要字段
-	if voucher.ServerURL == "" || voucher.Secret == "" || voucher.AgentId == "" || voucher.ThingsPanelApiKey == "" {
-		h.logger.Error("Voucher中缺少必要字段")
-		return nil, fmt.Errorf("Voucher中缺少必要字段")
-	}
-
-	// 准备请求数据
-	requestData := map[string]string{
-		"secret":           voucher.Secret,
-		"agent_id":         voucher.AgentId,
-		"external_api_key": voucher.ThingsPanelApiKey,
-		"device_code":      req.Key,
-	}
-	requestBody, err := json.Marshal(requestData)
-	if err != nil {
-		h.logger.WithError(err).Error("序列化请求数据失败")
-		return nil, err
-	}
-
-	// 发送POST请求
-	resp, err := http.Post(voucher.ServerURL+"/device/bind", "application/json", bytes.NewBuffer(requestBody))
-	if err != nil {
-		h.logger.WithError(err).Error("调用第三方接口失败")
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	// 读取响应体
-	bodyBytes, err := io.ReadAll(resp.Body)
-	if err != nil {
-		h.logger.WithError(err).Error("读取响应体失败")
-		return nil, err
-	}
-
-	// 输出响应体日志
-	h.logger.WithFields(logrus.Fields{
-		"status_code": resp.StatusCode,
-		"body":        string(bodyBytes),
-	}).Info("第三方接口响应")
-
-	// 解析响应
-	var responseData struct {
-		Code int    `json:"code"`
-		Msg  string `json:"msg"`
-		Data struct {
-			DeviceName        string `json:"device_name"`
-			DeviceNumber      string `json:"device_number"`
-			DeviceDescription string `json:"device_description"`
-		} `json:"data"`
-	}
-	if err := json.Unmarshal(bodyBytes, &responseData); err != nil {
-		h.logger.WithError(err).Error("解析响应数据失败")
-		return nil, err
-	}
-
-	// 检查响应码
-	if responseData.Code != 0 {
-		h.logger.WithFields(logrus.Fields{
-			"code": responseData.Code,
-			"msg":  responseData.Msg,
-		}).Error("第三方接口返回错误")
-		return nil, fmt.Errorf("第三方接口错误: %s", responseData.Msg)
-	}
-
-	// 组装DeviceItem
-	deviceItem := handler.DeviceItem{
-		DeviceName:   responseData.Data.DeviceName,
-		DeviceNumber: responseData.Data.DeviceNumber,
-		Description:  responseData.Data.DeviceDescription,
-	}
-
-	rsp := handler.GetDeviceInfoResponse{
-		Code:    200,
-		Message: "获取成功",
-		Data:    deviceItem,
-	}
 
 	return &rsp, nil
 }
