@@ -39,26 +39,5 @@
             "required": true,
             "type": "string"
         }
-    },
-    {
-        "type": "select",
-        "dataKey": "auth_type",
-        "required": true,
-        "label": "接入方式",
-        "options": [
-            {
-                "label": "自动",
-                "value": "auto"
-            },
-            {
-                "label": "手动",
-                "value": "manual"
-            }
-        ],
-        "placeholder": "请选择设备接入方式",
-        "validate": {
-            "type": "string",
-            "required": true
-        }
     }
 ]
