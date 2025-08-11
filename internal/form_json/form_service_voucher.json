@@ -39,5 +39,15 @@
             "required": true,
             "type": "string"
         }
+    },
+    {
+        "dataKey": "TemplateSecret",
+        "label": "一型一密设备的密码",
+        "placeholder": "设备模板->ESP32设备->设备设置->一型一密设备的密码",
+        "type": "input",
+        "validate": {
+            "required": true,
+            "type": "string"
+        }
     }
 ]
